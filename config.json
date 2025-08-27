@@ -1,0 +1,11 @@
+{
+    "logo_scale": 1.6693877551020408,
+    "pair_search_scale": 1.4576923076923074,
+    "pair_search_accuracy": 0.8811827898025513,
+    "pair_name": "natural_gas",
+    "pair_accuracy": 0.6004335880279541,
+    "trader_name": "hoag.png",
+    "trader_accuracy": 0.8834099769592285,
+    "trader_method": "resized",
+    "trader_scale": 1.4500000000000002
+}

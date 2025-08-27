@@ -1,0 +1,251 @@
+
+from main import process_frame,create_or_append_number
+from mt5_functions import init
+from screen import capture_screen,capture_live_screen
+import json
+import os
+import time
+import csv
+from std_out import Print
+import random
+
+
+
+
+
+def init_trades_log():
+    CSV_FILE = "trades_2_log.csv"
+    # # Ensure CSV file has a header if it doesn't exist
+    if not os.path.exists(CSV_FILE):
+        with open(CSV_FILE, 'w', newline='') as f:
+            writer = csv.writer(f)
+            writer.writerow(['pair', 'trader', 'event', 'timestamp' ,'yt_time','link','screens','frame','title'])
+
+
+
+
+def create_data():
+    trades_data = {
+        "example": {
+            "active": {
+                random.choice(["GBPUSD", "USDJPY"]): {
+                    "trade_type": random.choice(["buy", "sell"]),
+                    "open_time": time.time(),
+                    "sl": True,
+                    "tp": True,
+                    "status": "open"
+                }
+            },
+            "unknown": {},
+            "rejected": {},
+            "config": {
+                "ignore": True,
+                "ignore_pairs": ["EURUSD"],
+                "only_pairs": ["GBPUSD", "USDJPY"],
+                "use_custom_risk": True,
+                "custom_risk": 0.02
+            }
+        },
+        "jd": {
+            "active": {},
+            "unknown": {},
+            "rejected": {},
+            "config": {
+                "ignore": False,
+                "ignore_pairs": [],
+                "only_pairs": [],
+                "use_custom_risk": True,
+                "custom_risk": 0.2
+            }
+        },
+        "doom": {
+            "active": {},
+            "unknown": {},
+            "rejected": {},
+            "config": {
+                "ignore": False,
+                "ignore_pairs": [],
+                "only_pairs": ["US100"],
+                "use_custom_risk": False,
+                "custom_risk": 0
+            }
+        },
+        "anne": {
+            "active": {},
+            "unknown": {},
+            "rejected": {},
+            "config": {
+                "ignore": True,
+                "ignore_pairs": [],
+                "only_pairs": [],
+                "use_custom_risk": True,
+                "custom_risk": 0.2
+            }
+        },
+    }
+
+    with open("trades_data.json", "w") as f:
+        json.dump(trades_data, f, indent=4)
+
+# Example usage
+# create_data()
+
+
+def main():
+    # init(path)
+    stream_is_live = True
+    stream_link = ""
+    stream_name = ""
+    time_s = 0
+    stream_mode = "low"
+    active_trades = {}
+    path = "C:/Program Files/FBS MetaTrader 5/terminal64.exe"
+    # path = "C:/Program Files/MetaTrader 5/terminal64.exe"
+    check_double_screen =  True
+    crop_screen = True
+    name = False
+    check_x_scale = True
+    """for when the x scale is changing in size"""
+    trader_does_not_have_logo = False
+    check_paper_acc = True
+    check_limit_orders = False
+    create_new_trade_data_file = True
+
+    # Start Wi-Fi monitor in background
+    # start_wifi_thread("itel P55 5G")
+
+    # Single JSON file for all trades
+    if create_new_trade_data_file:
+        create_data()
+    trades_file = "trades_data.json"
+
+    if not os.path.exists(trades_file):
+        with open(trades_file, "w") as f:
+            json.dump({}, f)
+
+    count = 2
+    while True:
+        # internet_available.wait()  # Block here if no internet
+
+        if stream_is_live:
+            start=time.time()
+            image = capture_screen(count)
+            create_or_append_number("screen_num.txt",0)
+            
+            # cv2.imshow("image", image)
+            # cv2.waitKey(3000)
+            if len(image) == 0:
+                break
+
+            try:
+                with open(trades_file, "r") as f:
+                    trades_data = json.load(f)
+            except json.JSONDecodeError:
+                trades_data = {}
+
+            trades_data = process_frame(
+                image,
+                time_s=time_s,
+                video_link=stream_name,
+                trades_data=trades_data,  # pass single dict
+                stream_mode=stream_mode,
+                check_double_screen=check_double_screen,
+                crop_screen=crop_screen,
+                name=name,
+                check_x_scale=check_x_scale,
+                check_paper_acc=check_paper_acc,
+                check_limit_orders=check_limit_orders
+            )
+
+            # Save updated data back to single JSON file
+            with open(trades_file, "w") as f:
+                json.dump(trades_data, f, indent=2)
+            print("Processing this image took: ",time.time()-start)
+            print("\n")
+
+import os
+import shutil
+from datetime import datetime
+
+import os
+
+def delete_file(file_path: str) -> bool:
+    """
+    Deletes a file if it exists.
+
+    Args:
+        file_path (str): Path to the file to be deleted.
+
+    Returns:
+        bool: True if the file was deleted, False if it didn't exist.
+    """
+    if os.path.exists(file_path):
+        try:
+            os.remove(file_path)
+            print(f"[DELETED] {file_path}")
+            return True
+        except Exception as e:
+            print(f"[ERROR] Could not delete {file_path}: {e}")
+            return False
+    else:
+        print(f"[SKIPPED] {file_path} does not exist.")
+        return False
+
+
+def archive_trade_logs(video_path_file):
+    """
+    Creates a folder and moves specific trade log files into it,
+    then deletes them from the current folder (via move).
+
+    Args:
+        destination_root (str): Base directory where the archive folder will be created.
+    """
+    # List of files to archive
+    files_to_move = [
+        "trade_log.csv",
+        "trades_2_log.csv",
+        "logs.txt",
+        "mt5_errors.txt",
+        "active_trades.json",
+        "errors.txt"
+    ]
+
+    # Create destination folder with timestamp
+    # timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    dest_folder = video_path_file.split("/")[-1].split(".")[0]
+    dest_folder = "archive/"+dest_folder
+    os.makedirs(dest_folder, exist_ok=True)
+
+    # Move files if they exist
+    for filename in files_to_move:
+        if os.path.exists(filename):
+            shutil.move(filename, os.path.join(dest_folder, filename))
+            print(f"[MOVED] {filename} -> {dest_folder}")
+        else:
+            print(f"[SKIPPED] {filename} not found.")
+
+    print(f"Archive completed: {dest_folder}")
+
+import random
+import sys
+
+if __name__ == "__main__":
+    video = sys.argv[1]  # full path passed in from subprocess
+    video_path_file = "video_path.txt"
+    video_files = [f for f in os.listdir() if f.endswith((".mp4", ".mkv", ".webm"))]
+    if not video_files:
+        raise FileNotFoundError("No video found in")
+    
+    if not os.path.exists(video_path_file):
+        with open(video_path_file, "w") as f:
+            f.write(video_files[0])
+
+    main()
+    # main()
+    # from main import scrape_screen
+    # img = cv2.imread("C:/Users/Brayo/Desktop/dakota_floor/names/Screenshot 2025-08-07 080359.png")
+    # trades = scrape_screen(img,check_x_scale=True)
+    # print(trades)
+    # print("\n")
+    # trades = scrape_screen(img,check_x_scale=False)
+    # print(trades)
