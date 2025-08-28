@@ -162,6 +162,7 @@ def main():
                 json.dump(trades_data, f, indent=2)
             print("Processing this image took: ",time.time()-start)
             print("\n")
+    
 
 import os
 import shutil

@@ -1,4 +1,4 @@
-import MetaTrader5 as mt5
+import mt5linux as mt5
 from datetime import datetime,timedelta
 # def recalculate_risk(entry_time,pair_name,pip_risk,ai_pair_name):
 #     pass
