@@ -111,6 +111,27 @@ def main():
     check_paper_acc = True
     check_limit_orders = False
     create_new_trade_data_file = True
+    
+    with open("info.json","r") as file:
+        info = json.load(file)
+        
+    name = info.get("video_name").lower()
+    if "jay" in name:
+        name = "Jay"
+        crop_screen = False
+    elif "dee" in name:
+        name = "Dee"
+        crop_screen = False
+    elif "aaron" in name:
+        name = "Aaron"
+        crop_screen = False
+    elif "dakota" in name:
+        name = "Dakota"
+        crop_screen = False
+    elif "anne" in name:
+        name = "Marie"
+        crop_screen = False
+    
 
     # Start Wi-Fi monitor in background
     # start_wifi_thread("itel P55 5G")
