@@ -93,9 +93,9 @@ def crop_chart_region(image):
     top_right = None
     bottom_left = get_bottom_left(image)
     bottom_right = None
-    default_top = 122
-    default_left = 1564-1366
-    default_bottom = 635
+    default_top = 0
+    default_left = 0
+    default_bottom = img_height
      
     if top_left is None:
         if bottom_left is not None:
@@ -215,9 +215,13 @@ def find_trade_buttons(trade_templates,chart_img, threshold=0.95):
 
 if __name__ == "__main__":
     # image = cv2.imread("screen.png")
-    from screen import capture_screen
-    image = capture_screen(2)
-    chart = crop_chart_region(image = image)
-    cv2.imshow("chart",chart)
-    cv2.waitKey(0)
+    # from screen import capture_screen
+    # image = capture_screen(2)
+    # chart = crop_chart_region(image = image)
+    # cv2.imshow("chart",chart)
+    # cv2.waitKey(0)
     # cv2.imwrite("chart.png",chart)
+    image = cv2.imread("chart.png")
+    top_left,logo_exists,total_matches,matches = get_top_left(image)
+    print("logo exists: ",logo_exists)
+    
