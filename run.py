@@ -8,6 +8,7 @@ import time
 import csv
 from std_out import Print
 import random
+from send_data import send_zipped_file,collect_and_zip_files
 
 
 
@@ -163,6 +164,8 @@ def main():
             print("Processing this image took: ",time.time()-start)
             print("\n")
     
+    folder, zip_file = collect_and_zip_files()
+    send_zipped_file(local_zip=zip_file)
 
 import os
 import shutil
