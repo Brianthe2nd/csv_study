@@ -9,6 +9,9 @@ import csv
 from std_out import Print
 import random
 from send_data import send_zipped_file,collect_and_zip_files
+import sys
+import shutil
+from datetime import datetime
 
 
 
@@ -94,6 +97,15 @@ def create_data():
 
 
 def main():
+    video_path_file = os.path.join(os.path.dirname(__file__),"video_path.txt")
+    video_files = [f for f in os.listdir() if f.endswith((".mp4", ".mkv", ".webm"))]
+    if not video_files:
+        raise FileNotFoundError("No video found in")
+    
+    if not os.path.exists(video_path_file):
+        with open(video_path_file, "w") as f:
+            f.write(video_files[0])
+
     # init(path)
     stream_is_live = True
     stream_link = ""
@@ -190,11 +202,7 @@ def main():
     folder, zip_file = collect_and_zip_files()
     send_zipped_file(local_zip=zip_file)
 
-import os
-import shutil
-from datetime import datetime
 
-import os
 
 def delete_file(file_path: str) -> bool:
     """
@@ -253,26 +261,8 @@ def archive_trade_logs(video_path_file):
 
     print(f"Archive completed: {dest_folder}")
 
-import random
-import sys
+
 
 if __name__ == "__main__":
     video = sys.argv[1]  # full path passed in from subprocess
-    video_path_file = os.path.join(os.path.dirname(__file__),"video_path.txt")
-    video_files = [f for f in os.listdir() if f.endswith((".mp4", ".mkv", ".webm"))]
-    if not video_files:
-        raise FileNotFoundError("No video found in")
-    
-    if not os.path.exists(video_path_file):
-        with open(video_path_file, "w") as f:
-            f.write(video_files[0])
-
     main()
-    # main()
-    # from main import scrape_screen
-    # img = cv2.imread("C:/Users/Brayo/Desktop/dakota_floor/names/Screenshot 2025-08-07 080359.png")
-    # trades = scrape_screen(img,check_x_scale=True)
-    # print(trades)
-    # print("\n")
-    # trades = scrape_screen(img,check_x_scale=False)
-    # print(trades)
