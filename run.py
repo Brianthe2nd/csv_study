@@ -104,7 +104,7 @@ def main():
     
     if not os.path.exists(video_path_file):
         with open(video_path_file, "w") as f:
-            f.write(video_files[0])
+            f.write(os.path.join(os.path.dirname(__file__),video_files[0]))
 
     # init(path)
     stream_is_live = True
