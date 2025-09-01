@@ -98,9 +98,9 @@ def create_data():
 
 def main():
     video_path_file = os.path.join(os.path.dirname(__file__),"video_path.txt")
-    video_files = [f for f in os.listdir() if f.endswith((".mp4", ".mkv", ".webm"))]
+    video_files = [f for f in os.listdir(os.path.dirname(__file__)) if f.endswith((".mp4", ".mkv", ".webm"))]
     if not video_files:
-        raise FileNotFoundError("No video found in")
+        raise FileNotFoundError("No video found in the csv_study folder")
     
     if not os.path.exists(video_path_file):
         with open(video_path_file, "w") as f:
