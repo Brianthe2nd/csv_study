@@ -6,20 +6,21 @@ import traceback
 import os
 
 def play_error_sound():
-    system = platform.system()
+    # system = platform.system()
 
-    if system == "Windows":
-        import winsound
-        winsound.MessageBeep(winsound.MB_ICONHAND)  # Error sound
+    # if system == "Windows":
+    #     import winsound
+    #     winsound.MessageBeep(winsound.MB_ICONHAND)  # Error sound
 
-    elif system == "Darwin":  # macOS
-        subprocess.run(["afplay", "/System/Library/Sounds/Funk.aiff"])
+    # elif system == "Darwin":  # macOS
+    #     subprocess.run(["afplay", "/System/Library/Sounds/Funk.aiff"])
 
-    elif system == "Linux":
-        # Tries to play a built-in system sound
-        subprocess.run(["paplay", "/usr/share/sounds/freedesktop/stereo/dialog-error.oga"])
-    else:
-        print("Unsupported OS for sound.")
+    # elif system == "Linux":
+    #     # Tries to play a built-in system sound
+    #     subprocess.run(["paplay", "/usr/share/sounds/freedesktop/stereo/dialog-error.oga"])
+    # else:
+    #     print("Unsupported OS for sound.")
+    pass
 
 def Print(*args, sep=' ', end='\n', file=None, flush=True ,log_path = "logs.txt"):
     log_path = os.path.join(os.path.dirname(__file__), log_path)
@@ -64,4 +65,4 @@ def log_exception(log_path = "logs.txt"):
 
     # Also print to console
     Print(error_text,flush= True)
-    play_error_sound()
+    # play_error_sound()

@@ -930,7 +930,7 @@ def process_frame(or_frame,time_s,video_link,trades_data,stream_mode,check_doubl
 
         except Exception as e:
             Print(f"[ERROR in main] {e}",log_path = os.path.join(os.path.dirname(__file__),"errors.txt"))
-            log_exception(log_path = "errors.txt")
+            log_exception(log_path = os.path.join(os.path.dirname(__file__),"errors.txt"))
             return trades_data
 
 

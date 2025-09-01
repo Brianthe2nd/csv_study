@@ -214,7 +214,7 @@ def get_pair_name(image, logo_scaling):
         image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)  
 
     pairs = os.listdir(os.path.join(os.path.dirname(__file__), "pairs_2_resized"))
-    search_button_org = cv2.imread("templates/pair_search.png", cv2.IMREAD_GRAYSCALE)
+    search_button_org = cv2.imread(os.path.join(os.path.dirname(__file__),"templates","pair_search.png"), cv2.IMREAD_GRAYSCALE)
     if image is None or search_button_org is None:
         raise ValueError("Failed to load image or search button.")
 
