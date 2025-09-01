@@ -19,7 +19,7 @@ def match_at_scale(haystack, needle, scale):
         # print("Scale: ",scale," Match: ",max_val)
         return (max_val, scale, max_loc, iwidth, iheight)
     except Exception as e:
-        Print(f"Error at scale {scale}: {e}",log_path = "errors.txt")
+        Print(f"Error at scale {scale}: {e}",log_path = os.path.join(os.path.dirname(__file__), "errors.txt"))
         
         return None
 
@@ -83,7 +83,7 @@ def blur_to_level(image, target_blur, step=3):
     return blurred
 
 def get_min_bluriness(img):
-    pairs = os.listdir("pairs_2_resized")
+    pairs = os.listdir(os.path.join(os.path.dirname(__file__), "pairs_2_resized"))
     min_bluriness = 99999999
     for pair in pairs:
         bluriness = measure_blurriness(cv2.imread("pairs_2_resized/"+pair))
@@ -156,16 +156,16 @@ def preprocess_with_contours(img):
     return processed
 
 def secondary_check(or_cropped,logo_scaling):
-    pairs = os.listdir("pairs_2_resized")
+    pairs = os.listdir(os.path.join(os.path.dirname(__file__), "pairs_2_resized"))
     print("SECONDARY CHECK")
-    search_button_org = cv2.imread("templates/pair_search.png", cv2.IMREAD_GRAYSCALE)
+    search_button_org = cv2.imread(os.path.join(os.path.dirname(__file__), "templates","pair_search.png"), cv2.IMREAD_GRAYSCALE)
     max_val, best_scale_for_screen, best_loc,iwidth, iheight = get_best_scale(or_cropped, search_button_org,logo_scaling)
     Print("scaling division:",logo_scaling/best_scale_for_screen)
     Print("best scale:",best_scale_for_screen)
     max_value = 0
     pair_str = ""
     for pair in pairs:
-        template_scaled = cv2.imread(f"pairs_2_resized/{pair}", cv2.IMREAD_GRAYSCALE)
+        template_scaled = cv2.imread(os.path.join(os.path.dirname(__file__), "pairs_2_resized",pair), cv2.IMREAD_GRAYSCALE)
         pair_height, pair_width = template_scaled.shape[:2]
         addition = 0
         if pair_height > iheight:
@@ -180,7 +180,7 @@ def secondary_check(or_cropped,logo_scaling):
         try:
             screen_scaled = cv2.resize(cropped, None, fx=1 / best_scale_for_screen, fy=1 / best_scale_for_screen, interpolation=cv2.INTER_LINEAR)
         except:
-            Print(f"Resize failed for {pair}",log_path = "errors.txt")
+            Print(f"Resize failed for {pair}",log_path = os.path.join(os.path.dirname(__file__), "errors.txt"))
             
             continue
 
@@ -213,7 +213,7 @@ def get_pair_name(image, logo_scaling):
     if len(image.shape) == 3 and image.shape[2] == 3:
         image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)  
 
-    pairs = os.listdir("pairs_2_resized")
+    pairs = os.listdir(os.path.join(os.path.dirname(__file__), "pairs_2_resized"))
     search_button_org = cv2.imread("templates/pair_search.png", cv2.IMREAD_GRAYSCALE)
     if image is None or search_button_org is None:
         raise ValueError("Failed to load image or search button.")
@@ -237,7 +237,7 @@ def get_pair_name(image, logo_scaling):
     config_pair_accuracy = get_config("pair_accuracy")
 
     if config_pair_name and config_pair_accuracy:
-        template_scaled = cv2.imread(f"pairs_2_resized/{config_pair_name}.png", cv2.IMREAD_GRAYSCALE)
+        template_scaled = cv2.imread(os.path.join(os.path.dirname(__file__), "pairs_2_resized","config_pair_name"+".png"), cv2.IMREAD_GRAYSCALE)
         if template_scaled is not None:
             pair_height, pair_width = template_scaled.shape[:2]
             addition = max(0, ceil((pair_height - iheight) / 2))
@@ -254,7 +254,7 @@ def get_pair_name(image, logo_scaling):
                     interpolation=cv2.INTER_LINEAR
                 )
             except:
-                Print(f"Resize failed for {config_pair_name}", log_path="errors.txt")
+                Print(f"Resize failed for {config_pair_name}", log_path=os.path.join(os.path.dirname(__file__),"errors.txt"))
                 screen_scaled = None
 
             if screen_scaled is not None:
@@ -274,7 +274,7 @@ def get_pair_name(image, logo_scaling):
 
     # --- Step 2: Full search over all pairs ---
     for pair in pairs:
-        template_scaled = cv2.imread(f"pairs_2_resized/{pair}", cv2.IMREAD_GRAYSCALE)
+        template_scaled = cv2.imread(os.path.join(os.path.dirname(__file__),"pairs_2_resized",pair), cv2.IMREAD_GRAYSCALE)
         if template_scaled is None:
             Print(f"Failed to load {pair}")
             continue
@@ -294,7 +294,7 @@ def get_pair_name(image, logo_scaling):
                 interpolation=cv2.INTER_LINEAR
             )
         except:
-            Print(f"Resize failed for {pair}", log_path="errors.txt")
+            Print(f"Resize failed for {pair}", log_path=os.path.join(os.path.dirname(__file__),"errors.txt"))
             continue
 
         if (template_scaled.shape[0] > screen_scaled.shape[0] or 

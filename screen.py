@@ -24,8 +24,9 @@ def capture_screen(mon):
     Returns:
         frame (numpy.ndarray): The retrieved video frame, or None if unable to read.
     """
-    frame_number_file = "frame_number.txt"
-    video_path_file = "video_path.txt"
+    # frame_number_file = "frame_number.txt"
+    frame_number_file = os.path.join(os.path.dirname(__file__), "frame_number.txt")
+    video_path_file = os.path.join(os.path.dirname(__file__),"video_path.txt")
     # 1. Read video path
     if not os.path.exists(video_path_file):
             raise FileNotFoundError(f"Video path file '{video_path_file}' not found.")

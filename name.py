@@ -49,7 +49,8 @@ def match_template_resized(image, template_path, threshold=0.85):
 # === Unified worker functions ===
 def process_original(name, cropped, threshold):
     """Try matching at original size."""
-    template_path = os.path.join('names', name)
+    
+    template_path = os.path.join(os.path.join(os.path.dirname(__file__), "names"), name)
     match, val = match_template_with_best(cropped, template_path, threshold)
     if match is not None:
         return name, val, None  # scale=None for original
@@ -58,7 +59,7 @@ def process_original(name, cropped, threshold):
 
 def process_resized(name, cropped, threshold):
     """Try matching with resizing."""
-    template_path = os.path.join('names', name)
+    template_path = os.path.join(os.path.join(os.path.dirname(__file__), "names"), name)
     match, val, scale = match_template_resized(cropped, template_path, threshold)
     if match is not None:
         return name, val, scale
@@ -68,7 +69,7 @@ def process_resized(name, cropped, threshold):
 # === Main function ===
 def get_trader_name(image, threshold=0.9, resized_threshold=0.85, max_workers=8):
     """Detect trader name using config first, then fallback to threaded search."""
-    name_templates = fnmatch.filter(os.listdir('names'), '*.png')
+    name_templates = fnmatch.filter(os.listdir(os.path.join(os.path.dirname(__file__), "names")), '*.png')
 
     height, width = image.shape[:2]
     square_size = height // 2
@@ -81,7 +82,7 @@ def get_trader_name(image, threshold=0.9, resized_threshold=0.85, max_workers=8)
     preferred_scale = get_config("trader_scale")    # only valid if resized
 
     if preferred_name and preferred_accuracy and preferred_method:
-        template_path = os.path.join('names', preferred_name)
+        template_path = os.path.join(os.path.join(os.path.dirname(__file__), "names"), preferred_name)
 
         if preferred_method == "original":
             match, val = match_template_with_best(cropped, template_path, threshold)

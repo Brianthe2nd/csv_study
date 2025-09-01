@@ -138,7 +138,7 @@ def unmap_pair(pair):
         img_name =None
         Print("Unmap pair did not find a suitable match for: ",pair,log_path="error.txt")
     
-    img = cv2.imread(f"pairs_2_resized/{img_name}.png")
+    img = cv2.imread(os.path.join(os.path.dirname(__file__), "pairs_2_resized", f"{img_name}.png"))
     return img
 
 def clean_ai_response(trade_json):
@@ -154,7 +154,8 @@ def clean_ai_response(trade_json):
 
     except json.JSONDecodeError as e:
         # Save raw text to json_error.txt
-        with open("json_error.txt", "a", encoding="utf-8") as f:
+        json_error_file = os.path.join(os.path.dirname(__file__), "json_error.txt")
+        with open(json_error_file, "a", encoding="utf-8") as f:
             f.write(trade_json + "\n\n")
         Print(f"Error decoding JSON: {e}", log_path="errors.txt")
         return None

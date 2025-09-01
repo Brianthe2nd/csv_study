@@ -33,8 +33,7 @@ box_1_y = 5
 box_height = 6
 box_width = 7
 box_val = 8
-CSV_FILE = "trades_2_log.csv"
-
+CSV_FILE = os.path.join(os.path.dirname(__file__), "trades_2_log.csv")
 
 def reduce_X_close_points_exact(points, threshold=3 ,y_threshold=20):
     reduced = []
@@ -229,7 +228,7 @@ def scrape_screen(image,check_x_scale,logo_scaling):
     threshold = 0.15 if mode in [cv2.TM_SQDIFF, cv2.TM_SQDIFF_NORMED] else start
 
     # "config"
-    image_with_rects, matches ,w,h = match_template_and_draw(cropped, "templates/trade_search.png", threshold=threshold, mode=mode,check_x_scale=check_x_scale)
+    image_with_rects, matches ,w,h = match_template_and_draw(cropped, os.path.join(os.path.dirname(__file__), "templates", "trade_search.png"), threshold=threshold, mode=mode,check_x_scale=check_x_scale)
     converted = [tuple(int(x) if isinstance(x, (np.integer,)) else float(x) for x in item) for item in matches]
     # Assuming 'image', 'converted', 'h', and 'w' are defined earlier in your code.
 
@@ -339,10 +338,12 @@ def scrape_screen(image,check_x_scale,logo_scaling):
 
 
 def save_trade_event(pair, trader, event_type, timestamp, time_s, video_link):
-    frame_number_file = "frame_number.txt"
-    screen_num = read_file("screen_num.txt")
+    frame_number_file = os.path.join(os.path.dirname(__file__),"frame_number.txt")
+    screen_num_file = os.path.join(os.path.dirname(__file__), "screen_num.txt")
+    screen_num = read_file(screen_num_file)
     frame_num = read_file(frame_number_file)
-    with open("info.json","r") as file:
+    info_file = os.path.join(os.path.dirname(__file__), "info.json")
+    with open(info_file,"r") as file:
         info = json.load(file)
     
     
@@ -386,7 +387,8 @@ def get_level_data(frame, trades, start, stream_mode="normal"):
 
     except json.JSONDecodeError as e:
         # Save raw text to json_error.txt
-        with open("json_error.txt", "a", encoding="utf-8") as f:
+        json_error_path = os.path.join(os.path.dirname(__file__), "json_error.txt")
+        with open(json_error_path, "a", encoding="utf-8") as f:
             f.write(trade_json + "\n\n")
         Print(f"Error decoding JSON: {e}", log_path="errors.txt")
         return None
@@ -736,8 +738,9 @@ def process_frame(or_frame,time_s,video_link,trades_data,stream_mode,check_doubl
                     Print(f"The screen number is ,{screen_num}")
                 else:
                    screen_num = 1
-                   
-                create_or_append_number("screen_num.txt",screen_num)
+                
+                screen_num_file = os.path.join(os.path.dirname(__file__), "screen_num.txt")
+                create_or_append_number(screen_num_file,screen_num)
                 
                 if True:
                     trades_data = process_1_screen(frame=frame,check_x_scale=check_x_scale,scaling=scaling,video_link=video_link,start=start,time_s=time_s,check_limit_orders=check_limit_orders,stream_mode=stream_mode,or_frame=or_frame,crop_screen=crop_screen,name=name,trades_data=trades_data)
@@ -926,7 +929,7 @@ def process_frame(or_frame,time_s,video_link,trades_data,stream_mode,check_doubl
             return trades_data
 
         except Exception as e:
-            Print(f"[ERROR in main] {e}",log_path = "errors.txt")
+            Print(f"[ERROR in main] {e}",log_path = os.path.join(os.path.dirname(__file__),"errors.txt"))
             log_exception(log_path = "errors.txt")
             return trades_data
 

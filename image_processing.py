@@ -6,7 +6,8 @@ from logo import check_logo
 
 def get_top_left(image):
     scales = np.linspace(0.2, 2, 50)
-    logo_exists, total_matches,matches = check_logo(image,scales,True,"templates/logo.png")
+    logo_path = os.path.join(os.path.dirname(__file__), "templates", "logo.png")
+    logo_exists, total_matches,matches = check_logo(image,scales,True,logo_path)
     print("logo_exists:",logo_exists)
     if logo_exists:
         match_ = matches[0]
@@ -22,8 +23,8 @@ def get_top_right(or_image):
     x_add = (3*(width // 5))
     y_add = height // 2
     image = or_image[0:y_add, x_add:width]
-
-    logo_exists, total_matches,matches = check_logo(image,scales,True,"templates/top_right.png",custom_image=True)
+    top_right_path = os.path.join(os.path.dirname(__file__), "templates", "top_right.png")
+    logo_exists, total_matches,matches = check_logo(image,scales,True,top_right_path,custom_image=True)
     if logo_exists:
         match_ = matches[0]
         top_right = match_[0]
@@ -46,8 +47,9 @@ def get_bottom_right(or_image):
     y_add = height // 2
     x_add = (3*(width // 5))
     image = or_image[ y_add: height, x_add:width]
+    bottom_right_path = os.path.join(os.path.dirname(__file__), "templates", "bottom_right.png")
 
-    logo_exists, total_matches,matches = check_logo(image,scales,True,"templates/bottom_right.png",custom_image=True)
+    logo_exists, total_matches,matches = check_logo(image,scales,True,bottom_right_path,custom_image=True)
     if logo_exists:
         match_ = matches[0]
         bottom_right = match_[0]
@@ -64,7 +66,7 @@ def get_bottom_right(or_image):
     return bottom_right
 
 def get_bottom_left(image):
-    bottom_left_template_path="templates/bl.png"
+    bottom_left_template_path = os.path.join(os.path.dirname(__file__), "templates", "bl.png")
     # height, width = image.shape[:2]
     # image = image[height // 2 : height, 0:width//3]
     # cv2.imshow("bottom_left",image)
@@ -166,7 +168,8 @@ def find_trade_buttons(trade_templates,chart_img, threshold=0.95):
     for template in trade_templates:
       # if "sell_gray" in template or "buy_gray" in template:
       #   threshold = 0.8
-      trade_template_path = f"trade_templates/{template}"
+      
+      trade_template_path = os.path.join(os.path.dirname(__file__), "trade_templates", template)
       trade_template = cv2.imread(trade_template_path)
       if trade_template is None:
           raise FileNotFoundError(f"Template not found at {trade_template_path}")

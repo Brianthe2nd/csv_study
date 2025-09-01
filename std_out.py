@@ -3,6 +3,7 @@ import builtins
 from datetime import datetime
 import subprocess
 import traceback
+import os
 
 def play_error_sound():
     system = platform.system()
@@ -21,8 +22,10 @@ def play_error_sound():
         print("Unsupported OS for sound.")
 
 def Print(*args, sep=' ', end='\n', file=None, flush=True ,log_path = "logs.txt"):
+    log_path = os.path.join(os.path.dirname(__file__), log_path)
     message = sep.join(map(str, args)) + end
-    frame_number_file = "frame_number.txt"
+    # frame_number_file = "frame_number.txt"
+    frame_number_file = os.path.join(os.path.dirname(__file__), "frame_number.txt")
     try:
         with open(frame_number_file, "r") as f:
                 try:
@@ -36,20 +39,22 @@ def Print(*args, sep=' ', end='\n', file=None, flush=True ,log_path = "logs.txt"
         with open(log_path, "a", encoding="utf-8") as f:
             f.write(f"{datetime.now().isoformat()} -Frame {frame_number}- {message}")
     except PermissionError as e:
-        Print(f"PermissionError writing to log: {e}", log_path = "errors.txt")
+        Print(f"PermissionError writing to log: {e}", log_path = os.path.join(os.path.dirname(__file__),"errors.txt"))
         
     if log_path == "mt5_errors.txt":
         try:
-            with open("logs.txt", "a", encoding="utf-8") as f:
+            logs_path = os.path.join(os.path.dirname(__file__), "logs.txt")
+            with open(logs_path, "a", encoding="utf-8") as f:
                 f.write(f"{datetime.now().isoformat()} - {message}")
         except PermissionError as e:
-            Print(f"PermissionError writing to log: {e}", log_path = "errors.txt")
+            Print(f"PermissionError writing to log: {e}", log_path = os.path.join(os.path.dirname(__file__),"errors.txt"))
         
 
     builtins.print(*args, sep=sep, end=end, file=file, flush=flush)
 
 
 def log_exception(log_path = "logs.txt"):
+    log_path = os.path.join(os.path.dirname(__file__), log_path)
     # Capture the full traceback as a string
     error_text = traceback.format_exc()
 

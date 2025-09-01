@@ -15,7 +15,8 @@ from send_data import send_zipped_file,collect_and_zip_files
 
 
 def init_trades_log():
-    CSV_FILE = "trades_2_log.csv"
+    # CONFIG_PATH = os.path.join(os.path.dirname(__file__), "config.json")
+    CSV_FILE = os.path.join(os.path.dirname(__file__), "trades_2_log.csv")
     # # Ensure CSV file has a header if it doesn't exist
     if not os.path.exists(CSV_FILE):
         with open(CSV_FILE, 'w', newline='') as f:
@@ -84,8 +85,8 @@ def create_data():
             }
         },
     }
-
-    with open("trades_data.json", "w") as f:
+    trades_data_file = os.path.join(os.path.dirname(__file__),"trades_data.json")
+    with open(trades_data_file, "w") as f:
         json.dump(trades_data, f, indent=4)
 
 # Example usage
@@ -111,8 +112,8 @@ def main():
     check_paper_acc = True
     check_limit_orders = False
     create_new_trade_data_file = True
-    
-    with open("info.json","r") as file:
+    info_file = os.path.join(os.path.dirname(__file__), "info.json")
+    with open(info_file,"r") as file:
         info = json.load(file)
         
     name = info.get("video_name").lower()
@@ -139,7 +140,7 @@ def main():
     # Single JSON file for all trades
     if create_new_trade_data_file:
         create_data()
-    trades_file = "trades_data.json"
+    trades_file = os.path.join(os.path.dirname(__file__),"trades_data.json")
 
     if not os.path.exists(trades_file):
         with open(trades_file, "w") as f:
@@ -152,7 +153,8 @@ def main():
         if stream_is_live:
             start=time.time()
             image = capture_screen(count)
-            create_or_append_number("screen_num.txt",0)
+            screen_num_file = os.path.join(os.path.dirname(__file__), "screen_num.txt")
+            create_or_append_number(screen_num_file,0)
             
             # cv2.imshow("image", image)
             # cv2.waitKey(3000)
@@ -227,18 +229,18 @@ def archive_trade_logs(video_path_file):
     """
     # List of files to archive
     files_to_move = [
-        "trade_log.csv",
-        "trades_2_log.csv",
-        "logs.txt",
-        "mt5_errors.txt",
-        "active_trades.json",
-        "errors.txt"
+        os.path.join(os.path.dirname(__file__),"trade_log.csv"),
+        os.path.join(os.path.dirname(__file__),"trades_2_log.csv"),
+        os.path.join(os.path.dirname(__file__),"logs.txt"),
+        os.path.join(os.path.dirname(__file__),"mt5_errors.txt"),
+        os.path.join(os.path.dirname(__file__),"active_trades.json"),
+        os.path.join(os.path.dirname(__file__),"errors.txt")
     ]
 
     # Create destination folder with timestamp
     # timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     dest_folder = video_path_file.split("/")[-1].split(".")[0]
-    dest_folder = "archive/"+dest_folder
+    dest_folder = os.path.join(os.path.dirname(__file__),"archive",dest_folder)
     os.makedirs(dest_folder, exist_ok=True)
 
     # Move files if they exist
@@ -256,7 +258,7 @@ import sys
 
 if __name__ == "__main__":
     video = sys.argv[1]  # full path passed in from subprocess
-    video_path_file = "video_path.txt"
+    video_path_file = os.path.join(os.path.dirname(__file__),"video_path.txt")
     video_files = [f for f in os.listdir() if f.endswith((".mp4", ".mkv", ".webm"))]
     if not video_files:
         raise FileNotFoundError("No video found in")

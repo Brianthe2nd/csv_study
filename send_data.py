@@ -62,6 +62,7 @@ def collect_and_zip_files():
     """
     # Current working directory
     cwd = os.getcwd()
+    cwd = os.path.join(os.path.dirname(__file__))
     
     # Create unique folder name
     # folder_name = f"collected_files_{datetime.now().strftime('%Y%m%d_%H%M%S')}"

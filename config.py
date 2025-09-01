@@ -1,7 +1,7 @@
 import json
 import os
 
-CONFIG_PATH = "config.json"
+CONFIG_PATH = os.path.join(os.path.dirname(__file__), "config.json")
 
 def get_config(key=None, default=None):
     """

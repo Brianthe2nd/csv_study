@@ -80,13 +80,15 @@ def get_chart_num(image):
     cropped_image = image[0:height//5,width - width//3 : width]
     # cv2.imshow("cropeped",cropped_image)
     # cv2.waitKey(0)
-    single_val = match_template(cropped_image,"templates/single_chart.png")
+    
+    
+    single_val = match_template(cropped_image,os.path.join(os.path.dirname(__file__), "templates", "single_chart.png"))
     print("single",single_val)
-    double_val = match_template(cropped_image,"templates/double_chart.png")
+    double_val = match_template(cropped_image,os.path.join(os.path.dirname(__file__), "templates", "double_chart.png"))
     print("double",double_val)
     # triple_val = match_template(image,"templates/triple_chart.png")
     # print("triple",triple_val)
-    quadruple_val = match_template(cropped_image,"templates/quadruple_chart.png")
+    quadruple_val = match_template(cropped_image,os.path.join(os.path.dirname(__file__), "templates", "quadruple_chart.png"))
     print("quadruple",quadruple_val)
     
     chart_num = [single_val,double_val,0,quadruple_val]

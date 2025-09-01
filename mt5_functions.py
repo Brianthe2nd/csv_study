@@ -50,7 +50,7 @@ def map_pairs (pair):
         return pair
 
 
-def log_trade_action(action_type, symbol, volume, price, trade_type, sl, tp, comment="", ticket=None, filepath="trade_log.csv",ai_pair_name="non" ,video = ""):
+def log_trade_action(action_type, symbol, volume, price, trade_type, sl, tp, comment="", ticket=None, filepath=os.path.join(os.path.dirname(__file__),"trade_log.csv"),ai_pair_name="non" ,video = ""):
     """
     Logs a trade action to a CSV file.
 
@@ -110,7 +110,7 @@ def get_price_at_time(pair_name,  trade_type, seconds_range=(15, 30)):
     # Print("__TICKS__")
     # Print (ticks)   
     if ticks is None or len(ticks) == 0:
-        Print("No tick data found in the given time range.",log_path = "mt5_errors.txt")
+        Print("No tick data found in the given time range.",log_path = os.path.join(os.path.dirname(__file__),"mt5_errors.txt"))
         return None
 
     if trade_type == "buy":
@@ -135,12 +135,12 @@ def recalculate_risk(time_taken, latency, pair_name, pip_risk, ai_pair_name, tra
     #     pair_name = confirm_pair(pair_name)
     positions = mt5.positions_get(symbol=pair_name)
     if not positions:
-        Print(f"No open positions found for {pair_name}", log_path="mt5_errors.txt")
+        Print(f"No open positions found for {pair_name}", log_path=os.path.join(os.path.dirname(__file__),"mt5_errors.txt"))
         return
 
     symbol_info = mt5.symbol_info(pair_name)
     if symbol_info is None:
-        Print("Failed to get symbol info.", log_path="mt5_errors.txt")
+        Print("Failed to get symbol info.", log_path=os.path.join(os.path.dirname(__file__),"mt5_errors.txt"))
         return
 
     volume_min = symbol_info.volume_min
@@ -148,7 +148,7 @@ def recalculate_risk(time_taken, latency, pair_name, pip_risk, ai_pair_name, tra
 
     account = mt5.account_info()
     if account is None:
-        Print("Could not fetch account info.", log_path="mt5_errors.txt")
+        Print("Could not fetch account info.", log_path=os.path.join(os.path.dirname(__file__),"mt5_errors.txt"))
         return
 
     total_risk_capital = (risk / 100.0) * account.balance
@@ -234,12 +234,12 @@ def recalculate_risk(time_taken, latency, pair_name, pip_risk, ai_pair_name, tra
                 Print("Close order failed")
                 Print(mt5.last_error())
                 return None
-            log_trade_action("close", pair_name, volume_to_close, close_price, close_type, sl_price, 0, close_request["comment"], result.order, filepath="trade_log.csv", ai_pair_name=ai_pair_name, video=video)
+            log_trade_action("close", pair_name, volume_to_close, close_price, close_type, sl_price, 0, close_request["comment"], result.order, filepath=os.path.join(os.path.dirname(__file__),"trade_log.csv"), ai_pair_name=ai_pair_name, video=video)
 
             if result.retcode == mt5.TRADE_RETCODE_DONE:
                 Print(f"Successfully reduced risk by closing {volume_to_close} lots.")
             else:
-                Print(f"Failed to close partial position: {result.retcode}", log_path="mt5_errors.txt")
+                Print(f"Failed to close partial position: {result.retcode}", log_path=os.path.join(os.path.dirname(__file__),"mt5_errors.txt"))
             continue  # Don't add more if already over risk
 
         risk_per_lot = abs(mt5.order_calc_profit(
@@ -295,12 +295,12 @@ def recalculate_risk(time_taken, latency, pair_name, pip_risk, ai_pair_name, tra
         
 
 
-        log_trade_action("open", pair_name, additional_volume, price, add_type, sl_price, 0, request["comment"], result.order, filepath="trade_log.csv", ai_pair_name=ai_pair_name, video=video)
+        log_trade_action("open", pair_name, additional_volume, price, add_type, sl_price, 0, request["comment"], result.order, filepath=os.path.join(os.path.dirname(__file__),"trade_log.csv"), ai_pair_name=ai_pair_name, video=video)
 
         if result.retcode == mt5.TRADE_RETCODE_DONE:
             Print(f"Successfully added {additional_volume} lots.")
         else:
-            Print(f"Failed to open additional trade: {result.retcode}", log_path="mt5_errors.txt")
+            Print(f"Failed to open additional trade: {result.retcode}", log_path=os.path.join(os.path.dirname(__file__),"mt5_errors.txt"))
 
 
 
@@ -314,7 +314,7 @@ def update_trade(pair_name, level_type, level_value, ai_pair_name, trader_id, re
 
     positions = mt5.positions_get(symbol=pair_name)
     if not positions:
-        Print(f"No open positions found for {pair_name}", log_path="mt5_errors.txt")
+        Print(f"No open positions found for {pair_name}", log_path=os.path.join(os.path.dirname(__file__),"mt5_errors.txt"))
         return
 
     expected_comment_prefix = f"{trader_id}_{pair_name}"
@@ -366,9 +366,9 @@ def update_trade(pair_name, level_type, level_value, ai_pair_name, trader_id, re
         )
 
         if result.retcode != mt5.TRADE_RETCODE_DONE:
-            Print(f"Failed to update {level_type} for position {pos.ticket}: {result.retcode}", log_path="mt5_errors.txt")
+            Print(f"Failed to update {level_type} for position {pos.ticket}: {result.retcode}", log_path=os.path.join(os.path.dirname(__file__),"mt5_errors.txt"))
         else:
-            Print(f"Updated {level_type.upper()} for position {pos.ticket} to {level_value}", log_path="mt5_errors.txt")
+            Print(f"Updated {level_type.upper()} for position {pos.ticket} to {level_value}", log_path=os.path.join(os.path.dirname(__file__),"mt5_errors.txt"))
 
 
 # def open_trade(pair_name,trade_type,ai_pair_name):
@@ -383,16 +383,16 @@ def open_trade(pair_name, trade_type, ai_pair_name, trader_id, video ,risk = Non
     
     
     if not mt5.symbol_select(pair_name, True):
-        Print(f"Symbol {pair_name} not found or not available.", log_path="mt5_errors.txt")
+        Print(f"Symbol {pair_name} not found or not available.", log_path=os.path.join(os.path.dirname(__file__),"mt5_errors.txt"))
         return None
 
     tick = mt5.symbol_info_tick(pair_name)
     if tick is None:
-        Print(f"Failed to get tick data for {pair_name}", log_path="mt5_errors.txt")
+        Print(f"Failed to get tick data for {pair_name}", log_path=os.path.join(os.path.dirname(__file__),"mt5_errors.txt"))
         return None
     symbol_info = mt5.symbol_info(pair_name)
     if symbol_info is None:
-        Print("Failed to get symbol info.", log_path="mt5_errors.txt")
+        Print("Failed to get symbol info.", log_path=os.path.join(os.path.dirname(__file__),"mt5_errors.txt"))
         return
 
     volume_min = symbol_info.volume_min
@@ -436,14 +436,14 @@ def open_trade(pair_name, trade_type, ai_pair_name, trader_id, video ,risk = Non
     log_trade_action(
         "open", pair_name, 0.1, price, trade_type,
         0, 0,comment, result.order,
-        filepath="trade_log.csv", ai_pair_name=ai_pair_name, video=video
+        filepath=os.path.join(os.path.dirname(__file__),"trade_log.csv"), ai_pair_name=ai_pair_name, video=video
     )
 
     if result.retcode != mt5.TRADE_RETCODE_DONE:
-        Print(f"Order failed: retcode={result.retcode}", log_path="mt5_errors.txt")
+        Print(f"Order failed: retcode={result.retcode}", log_path=os.path.join(os.path.dirname(__file__),"mt5_errors.txt"))
         return None
     else:
-        Print(f"Order placed: {trade_type.upper()} {pair_name} at {price}", log_path="mt5_errors.txt")
+        Print(f"Order placed: {trade_type.upper()} {pair_name} at {price}", log_path=os.path.join(os.path.dirname(__file__),"mt5_errors.txt"))
         return result.order  # <-- Return the MT5 ticket number
 
 
@@ -465,7 +465,7 @@ def close_trade(pair_name, ai_pair_name, trader_id, video):
     # Get all open positions for the symbol
     positions = mt5.positions_get(symbol=pair_name)
     if positions is None or len(positions) == 0:
-        Print(f"No open positions found for {pair_name}", log_path="mt5_errors.txt")
+        Print(f"No open positions found for {pair_name}", log_path=os.path.join(os.path.dirname(__file__),"mt5_errors.txt"))
         return
 
     # Define the unique comment pattern we used in open_trade
@@ -473,7 +473,7 @@ def close_trade(pair_name, ai_pair_name, trader_id, video):
 
     for pos in positions:
         if expected_comment_prefix not in pos.comment:
-            Print("Skipping position with unexpected comment", log_path="mt5_errors.txt")
+            Print("Skipping position with unexpected comment", log_path=os.path.join(os.path.dirname(__file__),"mt5_errors.txt"))
             continue  # Skip positions not belonging to this trader
 
         order_type = (
@@ -511,9 +511,9 @@ def close_trade(pair_name, ai_pair_name, trader_id, video):
         )
 
         if result.retcode != mt5.TRADE_RETCODE_DONE:
-            Print(f"Failed to close position {pos.ticket}: {result.retcode}", log_path="mt5_errors.txt")
+            Print(f"Failed to close position {pos.ticket}: {result.retcode}", log_path=os.path.join(os.path.dirname(__file__),"mt5_errors.txt"))
         else:
-            Print(f"Closed position {pos.ticket} for {pair_name}", log_path="mt5_errors.txt")
+            Print(f"Closed position {pos.ticket} for {pair_name}", log_path=os.path.join(os.path.dirname(__file__),"mt5_errors.txt"))
 
 
 if __name__ == "__main__":

@@ -35,7 +35,7 @@ def match_template_or_none(image, template_path, scale):
 
 
 def check_logo(image, scales=np.linspace(0.3, 2, 50), return_matches=False,
-               logo_path="templates/logo.png", custom_image=False):
+               logo_path=os.path.join(os.path.dirname(__file__), "templates", "logo.png"), custom_image=False):
     """
     Tries to find a logo in the given image at various scales.
     Uses stored scale from config if available, updates config with best scale.
