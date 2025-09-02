@@ -74,19 +74,7 @@ def create_data():
                 "use_custom_risk": False,
                 "custom_risk": 0
             }
-        },
-        "anne": {
-            "active": {},
-            "unknown": {},
-            "rejected": {},
-            "config": {
-                "ignore": True,
-                "ignore_pairs": [],
-                "only_pairs": [],
-                "use_custom_risk": True,
-                "custom_risk": 0.2
-            }
-        },
+        }
     }
     trades_data_file = os.path.join(os.path.dirname(__file__),"trades_data.json")
     with open(trades_data_file, "w") as f:
