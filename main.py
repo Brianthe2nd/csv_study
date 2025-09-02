@@ -7,7 +7,8 @@ import threading
 import time
 import csv
 import re
-
+from typing import Optional
+import os
 
 from image_processing import crop_chart_region
 from color import process_color
@@ -689,8 +690,7 @@ def create_or_append_number(filename: str, number: int):
 
 
 
-def read_file(filename: str) -> int | None:
-
+def read_file(filename: str) -> Optional[int]:
     if not os.path.exists(filename):
         return None
     
