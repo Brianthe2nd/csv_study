@@ -237,7 +237,7 @@ def get_pair_name(image, logo_scaling):
     config_pair_accuracy = get_config("pair_accuracy")
 
     if config_pair_name and config_pair_accuracy:
-        template_scaled = cv2.imread(os.path.join(os.path.dirname(__file__), "pairs_2_resized","config_pair_name"+".png"), cv2.IMREAD_GRAYSCALE)
+        template_scaled = cv2.imread(os.path.join(os.path.dirname(__file__), "pairs_2_resized",config_pair_name+".png"), cv2.IMREAD_GRAYSCALE)
         if template_scaled is not None:
             pair_height, pair_width = template_scaled.shape[:2]
             addition = max(0, ceil((pair_height - iheight) / 2))
