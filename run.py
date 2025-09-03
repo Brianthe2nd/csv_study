@@ -187,8 +187,17 @@ def main():
             print("Processing this image took: ",time.time()-start)
             print("\n")
     
+    # 1. Read video path
+    if not os.path.exists(video_path_file):
+            raise FileNotFoundError(f"Video path file '{video_path_file}' not found.")
+    with open(video_path_file, "r") as f:
+        video_path = f.read().strip()
+    delete_file(video_path)
     folder, zip_file = collect_and_zip_files()
+    Print("saved the zip file in: ",zip_file)
     send_zipped_file(local_zip=zip_file)
+    video_path_file = os.path.join(os.path.dirname(__file__),"video_path.txt")
+
 
 
 

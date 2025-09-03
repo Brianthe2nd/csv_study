@@ -7,7 +7,7 @@ from datetime import datetime
 import uuid
 
 
-def send_zipped_file(host="13.49.80.166", port=22, username="admin", key_file="my_c71.pem", local_zip="archive.rar"):
+def send_zipped_file(host="13.49.80.166", port=22, username="ec2-user", key_file="my_c71.pem", local_zip="archive.rar"):
     """
     Sends a zipped file to a Linux server via SSH/SCP and saves it in ~/archives.
 
@@ -57,15 +57,13 @@ def send_zipped_file(host="13.49.80.166", port=22, username="admin", key_file="m
 
 def collect_and_zip_files():
     """
-    Collect all .txt, .csv, and .json files from current directory,
-    move them into a new folder, and zip that folder.
+    Collect all .txt, .csv, and .json files from the script's directory,
+    copy them into a single new folder, and zip that folder.
     """
-    # Current working directory
-    cwd = os.getcwd()
-    cwd = os.path.join(os.path.dirname(__file__))
-    
+    # Script directory (absolute path)
+    cwd = os.path.dirname(os.path.abspath(__file__))
+
     # Create unique folder name
-    # folder_name = f"collected_files_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
     unique_id = uuid.uuid4().hex[:6]  # short random ID
     folder_name = f"collected_files_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{unique_id}"
     folder_path = os.path.join(cwd, folder_name)
@@ -74,20 +72,20 @@ def collect_and_zip_files():
     # File extensions we care about
     extensions = (".txt", ".csv", ".json")
 
-    # Copy matching files into new folder
+    # Copy matching files into new folder (flat, no subfolders)
     for file in os.listdir(cwd):
-        if file.endswith(extensions) and os.path.isfile(file):
-            shutil.copy(file, folder_path)
+        file_path = os.path.join(cwd, file)  # absolute path
+        if file.endswith(extensions) and os.path.isfile(file_path):
+            shutil.copy(file_path, folder_path)
 
-    # Create zip file
+    # Create zip file (flat structure based on the collected folder)
     zip_name = f"{folder_name}.zip"
     zip_path = os.path.join(cwd, zip_name)
     with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zipf:
-        for root, _, files in os.walk(folder_path):
-            for file in files:
-                file_path = os.path.join(root, file)
-                arcname = os.path.relpath(file_path, folder_path)  # relative path inside zip
-                zipf.write(file_path, arcname)
+        for file in os.listdir(folder_path):
+            file_path = os.path.join(folder_path, file)
+            if os.path.isfile(file_path):
+                zipf.write(file_path, file)  # use just filename inside zip
 
     print(f"✅ Collected files are in: {folder_path}")
     print(f"✅ Zipped archive created: {zip_path}")
