@@ -188,6 +188,7 @@ def main():
             print("\n")
     
     # 1. Read video path
+    video_path_file = os.path.join(os.path.dirname(__file__),"video_path.txt")
     if not os.path.exists(video_path_file):
             raise FileNotFoundError(f"Video path file '{video_path_file}' not found.")
     with open(video_path_file, "r") as f:
