@@ -7,7 +7,7 @@ from datetime import datetime
 import uuid
 
 
-def send_zipped_file(host="13.49.80.166", port=22, username="ec2-user", key_file="my_c71.pem", local_zip="archive.rar"):
+def send_zipped_file(host="13.49.80.166", port=22, username="admin", key_file="my_c71.pem", local_zip="archive.rar"):
     """
     Sends a zipped file to a Linux server via SSH/SCP and saves it in ~/archives.
 
@@ -46,9 +46,6 @@ def send_zipped_file(host="13.49.80.166", port=22, username="ec2-user", key_file
 
 
 # send_zipped_file(
-#     host="13.49.18.152",
-#     port=22,
-#     username="admin",
 #     key_file="C://users/Brayo/Downloads/my_c71.pem",
 #     local_zip="names.rar"
 # )
