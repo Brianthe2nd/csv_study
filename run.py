@@ -203,8 +203,11 @@ def main():
     except Exception as e:
         print(e)
         traceback.print_exc()
-        
-        delete_file(video_path_file)
+        if not os.path.exists(video_path_file):
+            raise FileNotFoundError(f"Video path file '{video_path_file}' not found.")
+        with open(video_path_file, "r") as f:
+            video_path = f.read().strip()
+        delete_file(video_path)
 
 
 
