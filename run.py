@@ -11,6 +11,7 @@ import random
 from send_data import send_zipped_file,collect_and_zip_files
 import sys
 import shutil
+import traceback
 from datetime import datetime
 
 
@@ -86,118 +87,124 @@ def create_data():
 
 def main():
     video_path_file = os.path.join(os.path.dirname(__file__),"video_path.txt")
-    video_files = [f for f in os.listdir(os.path.dirname(__file__)) if f.endswith((".mp4", ".mkv", ".webm"))]
-    if not video_files:
-        raise FileNotFoundError("No video found in the csv_study folder")
-    
-    if not os.path.exists(video_path_file):
-        with open(video_path_file, "w") as f:
-            f.write(os.path.join(os.path.dirname(__file__),video_files[0]))
-
-    # init(path)
-    stream_is_live = True
-    stream_link = ""
-    stream_name = ""
-    time_s = 0
-    stream_mode = "low"
-    active_trades = {}
-    path = "C:/Program Files/FBS MetaTrader 5/terminal64.exe"
-    # path = "C:/Program Files/MetaTrader 5/terminal64.exe"
-    check_double_screen =  True
-    crop_screen = True
-    name = False
-    check_x_scale = True
-    """for when the x scale is changing in size"""
-    trader_does_not_have_logo = False
-    check_paper_acc = True
-    check_limit_orders = False
-    create_new_trade_data_file = True
-    info_file = os.path.join(os.path.dirname(__file__), "info.json")
-    with open(info_file,"r") as file:
-        info = json.load(file)
+    try:
+        video_files = [f for f in os.listdir(os.path.dirname(__file__)) if f.endswith((".mp4", ".mkv", ".webm"))]
+        if not video_files:
+            raise FileNotFoundError("No video found in the csv_study folder")
         
-    name = info.get("video_name").lower()
-    if "jay" in name:
-        name = "Jay"
-        crop_screen = False
-    elif "dee" in name:
-        name = "Dee"
-        crop_screen = False
-    elif "aaron" in name:
-        name = "Aaron"
-        crop_screen = False
-    elif "dakota" in name:
-        name = "Dakota"
-        crop_screen = False
-    elif "anne" in name:
-        name = "Marie"
-        crop_screen = False
-    
+        if not os.path.exists(video_path_file):
+            with open(video_path_file, "w") as f:
+                f.write(os.path.join(os.path.dirname(__file__),video_files[0]))
 
-    # Start Wi-Fi monitor in background
-    # start_wifi_thread("itel P55 5G")
-
-    # Single JSON file for all trades
-    if create_new_trade_data_file:
-        create_data()
-    trades_file = os.path.join(os.path.dirname(__file__),"trades_data.json")
-
-    if not os.path.exists(trades_file):
-        with open(trades_file, "w") as f:
-            json.dump({}, f)
-
-    count = 2
-    while True:
-        # internet_available.wait()  # Block here if no internet
-
-        if stream_is_live:
-            start=time.time()
-            image = capture_screen(count)
-            screen_num_file = os.path.join(os.path.dirname(__file__), "screen_num.txt")
-            create_or_append_number(screen_num_file,0)
+        # init(path)
+        stream_is_live = True
+        stream_link = ""
+        stream_name = ""
+        time_s = 0
+        stream_mode = "low"
+        active_trades = {}
+        path = "C:/Program Files/FBS MetaTrader 5/terminal64.exe"
+        # path = "C:/Program Files/MetaTrader 5/terminal64.exe"
+        check_double_screen =  True
+        crop_screen = True
+        name = False
+        check_x_scale = True
+        """for when the x scale is changing in size"""
+        trader_does_not_have_logo = False
+        check_paper_acc = True
+        check_limit_orders = False
+        create_new_trade_data_file = True
+        info_file = os.path.join(os.path.dirname(__file__), "info.json")
+        with open(info_file,"r") as file:
+            info = json.load(file)
             
-            # cv2.imshow("image", image)
-            # cv2.waitKey(3000)
-            if len(image) == 0:
-                break
+        name = info.get("video_name").lower()
+        if "jay" in name:
+            name = "Jay"
+            crop_screen = False
+        elif "dee" in name:
+            name = "Dee"
+            crop_screen = False
+        elif "aaron" in name:
+            name = "Aaron"
+            crop_screen = False
+        elif "dakota" in name:
+            name = "Dakota"
+            crop_screen = False
+        elif "anne" in name:
+            name = "Marie"
+            crop_screen = False
+        
 
-            try:
-                with open(trades_file, "r") as f:
-                    trades_data = json.load(f)
-            except json.JSONDecodeError:
-                trades_data = {}
+        # Start Wi-Fi monitor in background
+        # start_wifi_thread("itel P55 5G")
 
-            trades_data = process_frame(
-                image,
-                time_s=time_s,
-                video_link=stream_name,
-                trades_data=trades_data,  # pass single dict
-                stream_mode=stream_mode,
-                check_double_screen=check_double_screen,
-                crop_screen=crop_screen,
-                name=name,
-                check_x_scale=check_x_scale,
-                check_paper_acc=check_paper_acc,
-                check_limit_orders=check_limit_orders
-            )
+        # Single JSON file for all trades
+        if create_new_trade_data_file:
+            create_data()
+        trades_file = os.path.join(os.path.dirname(__file__),"trades_data.json")
 
-            # Save updated data back to single JSON file
+        if not os.path.exists(trades_file):
             with open(trades_file, "w") as f:
-                json.dump(trades_data, f, indent=2)
-            print("Processing this image took: ",time.time()-start)
-            print("\n")
-    
-    # 1. Read video path
-    video_path_file = os.path.join(os.path.dirname(__file__),"video_path.txt")
-    if not os.path.exists(video_path_file):
-            raise FileNotFoundError(f"Video path file '{video_path_file}' not found.")
-    with open(video_path_file, "r") as f:
-        video_path = f.read().strip()
-    delete_file(video_path)
-    folder, zip_file = collect_and_zip_files()
-    Print("saved the zip file in: ",zip_file)
-    send_zipped_file(local_zip=zip_file)
-    video_path_file = os.path.join(os.path.dirname(__file__),"video_path.txt")
+                json.dump({}, f)
+
+        count = 2
+        while True:
+            # internet_available.wait()  # Block here if no internet
+
+            if stream_is_live:
+                start=time.time()
+                image = capture_screen(count)
+                screen_num_file = os.path.join(os.path.dirname(__file__), "screen_num.txt")
+                create_or_append_number(screen_num_file,0)
+                
+                # cv2.imshow("image", image)
+                # cv2.waitKey(3000)
+                if len(image) == 0:
+                    break
+
+                try:
+                    with open(trades_file, "r") as f:
+                        trades_data = json.load(f)
+                except json.JSONDecodeError:
+                    trades_data = {}
+
+                trades_data = process_frame(
+                    image,
+                    time_s=time_s,
+                    video_link=stream_name,
+                    trades_data=trades_data,  # pass single dict
+                    stream_mode=stream_mode,
+                    check_double_screen=check_double_screen,
+                    crop_screen=crop_screen,
+                    name=name,
+                    check_x_scale=check_x_scale,
+                    check_paper_acc=check_paper_acc,
+                    check_limit_orders=check_limit_orders
+                )
+
+                # Save updated data back to single JSON file
+                with open(trades_file, "w") as f:
+                    json.dump(trades_data, f, indent=2)
+                print("Processing this image took: ",time.time()-start)
+                print("\n")
+        
+        # 1. Read video path
+        video_path_file = os.path.join(os.path.dirname(__file__),"video_path.txt")
+        if not os.path.exists(video_path_file):
+                raise FileNotFoundError(f"Video path file '{video_path_file}' not found.")
+        with open(video_path_file, "r") as f:
+            video_path = f.read().strip()
+        delete_file(video_path)
+        folder, zip_file = collect_and_zip_files()
+        Print("saved the zip file in: ",zip_file)
+        send_zipped_file(local_zip=zip_file)
+        video_path_file = os.path.join(os.path.dirname(__file__),"video_path.txt")
+    except Exception as e:
+        print(e)
+        traceback.print_exc()
+        
+        delete_file(video_path_file)
 
 
 
